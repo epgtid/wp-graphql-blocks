@@ -24,9 +24,15 @@ if (!class_exists('WPGraphQLBlocks')) {
 
   class Block
   {
+    public $attributes;
+    public $name;
+    public $dynamicContent;
+    public $originalContent;
+    public $htmlContent;
+    public $innerBlocks;
+
     public function __construct($data, $post_id, $post_content, $query_args, $global_theme_styles, $global_db_styles)
     {
-      error_reporting(E_ALL & ~E_WARNING);
       $blockString = render_block($data);
       wp_reset_postdata();
       $originalContent = str_replace("\n", "", $data['innerHTML']);
@@ -88,7 +94,7 @@ if (!class_exists('WPGraphQLBlocks')) {
       }
 
       if ($data['blockName'] == 'core/cover') {
-        if ($attributes['useFeaturedImage']) {
+        if (isset($attributes['useFeaturedImage']) && !empty($attributes['useFeaturedImage'])) {
           $attributes['id'] = get_post_thumbnail_id($post_id);
           $attributes['url'] = get_the_post_thumbnail_url($post_id, 'full');
         }
@@ -105,7 +111,7 @@ if (!class_exists('WPGraphQLBlocks')) {
       }
 
       if ($data['blockName'] == 'core/image') {
-        if (!$attributes['height'] && !$attributes['width']) {
+        if (!isset($attributes['height']) && !isset($attributes['width'])) {
           // get media item
           $img = wp_get_attachment_image_src($attributes['id'], 'full');
           if ($img) {
@@ -327,7 +333,7 @@ if (!class_exists('WPGraphQLBlocks')) {
         }
       }
 
-      if ($data['attrs']['post_id_to_hydrate_template']) {
+      if (isset($data['attrs']['post_id_to_hydrate_template']) && !empty($data['attrs']['post_id_to_hydrate_template'])) {
         // set global post object here
         global $post;
         $post = get_post($data['attrs']['post_id_to_hydrate_template']);
@@ -342,13 +348,14 @@ if (!class_exists('WPGraphQLBlocks')) {
 
       if ($data['blockName'] == 'core/paragraph') {
         $attributes['content'] = substr($htmlContent, strpos($htmlContent, ">") + 1, -4);
-        if ($attributes['align']) {
+        if (isset($attributes['align']) && !empty($attributes['align'])) {
           $attributes['textAlign'] = $attributes['align'];
           unset($attributes['align']);
         }
       }
       if ($data['blockName'] == 'core/button') {
         $dom = new \DOMDocument();
+        libxml_use_internal_errors(true);
         $htmlString = "<html><body>" . $htmlContent . "</body></html>";
         $htmlString = str_replace("\n", "", $htmlString);
         $htmlString = str_replace("\r", "", $htmlString);
@@ -383,6 +390,7 @@ if (!class_exists('WPGraphQLBlocks')) {
         if ($data['blockName'] !== 'wp-block-tools/loop-item' && $data['blockName'] !== 'core/cover' && $data['blockName'] !== 'core/media-text' && $data['blockName'] !== "core/navigation" && $data['blockName'] !== 'core/navigation-submenu') {
           if (count($innerBlocks)) {
             $dom = new \DOMDocument();
+            libxml_use_internal_errors(true);
             $htmlString = "<html><body>" . $htmlContent . "</body></html>";
             $htmlString = str_replace("\n", "", $htmlString);
             $htmlString = str_replace("\r", "", $htmlString);
