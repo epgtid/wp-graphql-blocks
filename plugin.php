@@ -355,6 +355,7 @@ if (!class_exists('WPGraphQLBlocks')) {
       }
       if ($data['blockName'] == 'core/button') {
         $dom = new \DOMDocument();
+        // Avoid warnings when loading HTML
         libxml_use_internal_errors(true);
         $htmlString = "<html><body>" . $htmlContent . "</body></html>";
         $htmlString = str_replace("\n", "", $htmlString);
@@ -390,6 +391,7 @@ if (!class_exists('WPGraphQLBlocks')) {
         if ($data['blockName'] !== 'wp-block-tools/loop-item' && $data['blockName'] !== 'core/cover' && $data['blockName'] !== 'core/media-text' && $data['blockName'] !== "core/navigation" && $data['blockName'] !== 'core/navigation-submenu') {
           if (count($innerBlocks)) {
             $dom = new \DOMDocument();
+            // Avoid warnings when loading HTML
             libxml_use_internal_errors(true);
             $htmlString = "<html><body>" . $htmlContent . "</body></html>";
             $htmlString = str_replace("\n", "", $htmlString);
