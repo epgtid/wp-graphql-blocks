@@ -31,7 +31,7 @@ if (!class_exists('WPGraphQLBlocks')) {
     public $htmlContent;
     public $innerBlocks;
 
-    public function __construct($data, $post_id, $post_content, $query_args, $global_theme_styles, $global_db_styles)
+     public function __construct($data, $post_id, $post_content, $query_args, $global_theme_styles, $global_db_styles)
     {
       $blockString = render_block($data);
       wp_reset_postdata();
